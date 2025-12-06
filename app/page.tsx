@@ -3,7 +3,8 @@
 import type React from "react"
 import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import { Mail, Phone, Code, Building, Award, User, Briefcase, GraduationCap } from "lucide-react"
+import { Mail, Phone, Code, Building, Award, User, Briefcase, GraduationCap, Moon, Sun } from "lucide-react"
+import { useTheme } from "next-themes"
 
 const PianoKey = ({
   note,
@@ -18,18 +19,26 @@ const PianoKey = ({
   onClick?: () => void
   section?: string
 }) => {
+  const labelMap: Record<string, string> = {
+    Certifications: "Certs",
+    Leadership: "Leader",
+    Management: "Mgmt",
+  }
+  const displaySection = section ? (labelMap[section] ?? section) : section
+  const isLeadership = displaySection === "Leadership"
+  const labelSizeClass = isBlack ? (isLeadership ? "text-[12px]" : "text-[11px]") : (isLeadership ? "text-[12px]" : "text-[12px]")
   return (
     <div
       className={`
         ${
           isBlack
-            ? "bg-gradient-to-b from-slate-900 to-black text-white w-20 h-56 -mx-4 z-10 relative shadow-2xl border border-slate-700"
-            : "bg-gradient-to-b from-white to-gray-50 text-slate-900 w-28 h-80 border border-gray-300 shadow-lg"
+            ? "bg-gradient-to-b from-slate-900 to-black text-white w-14 h-40 -mx-3 transform-gpu -translate-y-8 z-20 relative shadow-2xl border border-slate-700 rounded-md"
+            : "bg-gradient-to-b from-white to-gray-50 text-slate-900 w-24 h-64 z-10 border border-gray-300 shadow-lg rounded-b-md"
         }
         ${isPressed ? (isBlack ? "from-slate-700 to-slate-900 shadow-inner scale-[0.98]" : "from-gray-100 to-gray-200 shadow-inner scale-[0.98]") : ""}
         flex flex-col items-center justify-end pb-6 cursor-pointer
         transition-all duration-150 ease-out hover:shadow-xl
-        ${isBlack ? "hover:from-slate-800 hover:to-slate-900" : "hover:from-gray-50 hover:to-gray-100"}
+        ${isBlack ? "hover:from-neutral-800 hover:to-neutral-900" : "hover:from-neutral-50 hover:to-white dark:hover:from-neutral-100 dark:hover:to-white"}
         rounded-b-sm relative overflow-hidden
       `}
       onClick={onClick}
@@ -37,19 +46,16 @@ const PianoKey = ({
       {section && (
         <div className="text-center mb-4">
           <div
-            className={`text-xs font-medium tracking-wider uppercase ${
-              isBlack ? "text-gray-300" : "text-slate-700"
-            } ${isPressed ? "opacity-100" : "opacity-80"} transition-all duration-150`}
+            className={`font-semibold ${labelSizeClass} normal-case tracking-normal px-3 py-1.5 max-w-full overflow-hidden whitespace-normal break-words hyphens-auto text-center leading-snug shadow-sm ${isBlack ? "text-white bg-white/20 border border-white/25 rounded-md" : "text-neutral-800 dark:text-neutral-900 bg-black/5 dark:bg-white/60 border border-black/10 dark:border-white/40 rounded-md"} ${isPressed ? "opacity-100" : "opacity-90"} transition-all duration-150`}
+            title={section}
           >
-            {section}
+            {displaySection}
           </div>
         </div>
       )}
 
       <span
-        className={`relative z-10 font-semibold tracking-wide text-lg ${
-          isBlack ? "text-white" : "text-slate-900"
-        } ${isPressed ? "scale-95" : ""} transition-transform duration-150`}
+        className={`relative z-10 font-bold ${isBlack ? "text-base" : "text-lg"} block w-full text-center leading-tight select-none pointer-events-none px-1 ${isBlack ? "text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.6)]" : "text-neutral-900 dark:text-neutral-900"} ${isPressed ? "scale-95" : ""} transition-transform duration-150`}
       >
         {note}
       </span>
@@ -61,6 +67,7 @@ export default function InteractiveResume() {
   const [activeSection, setActiveSection] = useState<string | null>(null)
   const [pressedKeys, setPressedKeys] = useState<string[]>([])
   const audioContextRef = useRef<AudioContext | null>(null)
+  const { theme, setTheme, resolvedTheme } = useTheme()
 
   useEffect(() => {
     const initAudio = () => {
@@ -77,6 +84,19 @@ export default function InteractiveResume() {
     document.addEventListener("click", handleFirstInteraction)
     return () => document.removeEventListener("click", handleFirstInteraction)
   }, [])
+
+  useEffect(() => {
+    if (!activeSection) return
+    const handleMouseDown = (event: MouseEvent) => {
+      if (event.button === 0) {
+        setActiveSection(null)
+      }
+    }
+    document.addEventListener("mousedown", handleMouseDown)
+    return () => {
+      document.removeEventListener("mousedown", handleMouseDown)
+    }
+  }, [activeSection])
 
   const sections = [
     { id: "summary", label: "Summary", note: "C", icon: User },
@@ -239,13 +259,13 @@ export default function InteractiveResume() {
   }
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-slate-50 to-gray-100 flex flex-col items-center justify-center overflow-hidden">
-      <div className="absolute top-0 left-0 right-0 p-6 bg-white/95 backdrop-blur-sm z-30 border-b border-gray-200">
+    <div className="fixed inset-0 bg-gradient-to-br from-neutral-50 to-neutral-100 dark:from-neutral-950 dark:to-black flex flex-col items-center justify-center overflow-hidden">
+      <div className="absolute top-0 left-0 right-0 p-6 bg-white/90 dark:bg-neutral-900/80 backdrop-blur-sm z-30 border-b border-neutral-200 dark:border-neutral-800">
         <div className="flex justify-between items-center max-w-7xl mx-auto">
           <div>
-            <h1 className="text-3xl font-semibold tracking-tight mb-1 text-slate-900 whitespace-nowrap">Justin Christopher Le</h1>
-            <p className="text-slate-600 text-lg mb-1 font-medium">Senior Software Engineer • Charlotte, NC</p>
-            <div className="text-slate-500 text-sm font-medium">
+            <h1 className="text-3xl font-semibold tracking-tight mb-1 text-neutral-900 dark:text-neutral-100 whitespace-nowrap">Justin Christopher Le</h1>
+            <p className="text-neutral-600 dark:text-neutral-300 text-lg mb-1 font-medium">Senior Software Engineer • Charlotte, NC</p>
+            <div className="text-neutral-500 dark:text-neutral-400 text-sm font-medium">
               7+ Years Experience • Full-Stack Development • Enterprise Solutions
             </div>
           </div>
@@ -253,7 +273,17 @@ export default function InteractiveResume() {
             <Button
               size="lg"
               variant="outline"
-              className="border-slate-300 text-slate-700 hover:bg-slate-50 font-medium bg-transparent"
+              className="border-neutral-300 text-neutral-700 hover:bg-neutral-50 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-800 font-medium bg-transparent"
+              onClick={() => setTheme((resolvedTheme === "dark" ? "light" : "dark"))}
+              aria-label="Toggle theme"
+            >
+              {resolvedTheme === "dark" ? <Sun className="w-4 h-4 mr-2" /> : <Moon className="w-4 h-4 mr-2" />}
+              {resolvedTheme === "dark" ? "Light Mode" : "Dark Mode"}
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              className="border-neutral-300 text-neutral-700 hover:bg-neutral-50 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-800 font-medium bg-transparent"
             >
               <Phone className="w-4 h-4 mr-2" />
               704-996-9469
@@ -261,14 +291,14 @@ export default function InteractiveResume() {
             <Button
               size="lg"
               variant="outline"
-              className="border-slate-300 text-slate-700 hover:bg-slate-50 font-medium bg-transparent"
+              className="border-neutral-300 text-neutral-700 hover:bg-neutral-50 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-800 font-medium bg-transparent"
             >
               <Mail className="w-4 h-4 mr-2" />
               JustinLe.Work@gmail.com
             </Button>
             <Button
               size="lg"
-              className="bg-slate-900 text-white hover:bg-slate-800 font-medium"
+              className="bg-indigo-600 text-white hover:bg-indigo-500 font-medium"
               onClick={() => window.open("https://BuildAndServe.com", "_blank")}
             >
               <Building className="w-4 h-4 mr-2" />
@@ -279,13 +309,13 @@ export default function InteractiveResume() {
       </div>
 
       <div className="flex items-center justify-center">
-        <div className="bg-gradient-to-b from-slate-800 to-slate-900 p-12 rounded-lg shadow-2xl border border-slate-700">
+        <div className="bg-gradient-to-b from-neutral-100 to-neutral-200 dark:from-neutral-800 dark:to-neutral-900 p-8 rounded-lg shadow-2xl border border-neutral-300 dark:border-neutral-700">
           <div className="text-center mb-8">
             <h2 className="text-2xl font-semibold text-white mb-2 tracking-wide">Professional Portfolio</h2>
-            <p className="text-slate-300 text-sm font-medium">Select a section to view details</p>
+            <p className="text-neutral-600 dark:text-neutral-300 text-sm font-medium">Select a section to view details</p>
           </div>
 
-          <div className="flex relative justify-center">
+          <div className="flex relative justify-center gap-1">
             {pianoKeys.map((key, index) => (
               <PianoKey
                 key={index}
@@ -306,37 +336,50 @@ export default function InteractiveResume() {
       </div>
 
       {activeSection && (
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-40 animate-in slide-in-from-bottom-2 duration-300 fade-in">
-          <div className="bg-white border border-gray-300 rounded-lg p-8 max-w-4xl mx-auto shadow-xl">
-            <button
-              onClick={closeModal}
-              className="absolute top-4 right-4 text-gray-400 hover:text-slate-600 transition-colors duration-200"
-              aria-label="Close"
+        <>
+          <div
+            className="fixed inset-0 z-30 cursor-pointer"
+            onMouseDown={(e) => {
+              if (e.button === 0) setActiveSection(null)
+            }}
+          />
+          <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-40 animate-in slide-in-from-bottom-2 duration-300 fade-in">
+            <div
+              className="bg-white border border-gray-300 rounded-lg p-8 max-w-4xl mx-auto shadow-xl"
+              onMouseDown={(e) => {
+                if (e.button === 0) setActiveSection(null)
+              }}
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-            {(() => {
-              const content = getSectionContent(activeSection)
-              const section = sections.find((s) => s.id === activeSection)
-              const IconComponent = section?.icon || User
-              return content ? (
-                <div className="text-left">
-                  <div className="flex items-center gap-3 mb-4">
-                    <IconComponent className="w-5 h-5 text-slate-600" />
-                    <h3 className="text-xl font-semibold text-slate-900">{content.title}</h3>
+              <button
+                onClick={closeModal}
+                className="absolute top-4 right-4 text-gray-400 hover:text-slate-600 transition-colors duration-200"
+                aria-label="Close"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+              {(() => {
+                const content = getSectionContent(activeSection)
+                const section = sections.find((s) => s.id === activeSection)
+                const IconComponent = section?.icon || User
+                return content ? (
+                  <div className="text-left">
+                    <div className="flex items-center gap-3 mb-4">
+                      <IconComponent className="w-5 h-5 text-slate-600" />
+                      <h3 className="text-xl font-semibold text-slate-900">{content.title}</h3>
+                    </div>
+                    <p className="text-slate-700 leading-relaxed font-medium max-w-3xl">{content.content}</p>
                   </div>
-                  <p className="text-slate-700 leading-relaxed font-medium max-w-3xl">{content.content}</p>
-                </div>
-              ) : (
-                <div className="text-center">
-                  <p className="text-slate-500">Content not available</p>
-                </div>
-              )
-            })()}
+                ) : (
+                  <div className="text-center">
+                    <p className="text-slate-500">Content not available</p>
+                  </div>
+                )
+              })()}
+            </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   )

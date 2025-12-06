@@ -18,37 +18,46 @@ const PianoKey = ({
   onClick?: () => void
   section?: string
 }) => {
+  const labelMap: Record<string, string> = {
+    Certifications: "Certs",
+    Leadership: "Leader",
+    Management: "Mgmt",
+  }
+  const displaySection = section ? (labelMap[section] ?? section) : section
+  const isLeadership = displaySection === "Leadership"
+  const labelSizeClass = isBlack ? (isLeadership ? "text-[12px]" : "text-[11px]") : (isLeadership ? "text-[12px]" : "text-[12px]")
   return (
     <div
       className={`
         ${
           isBlack
-            ? "bg-gradient-to-b from-slate-900 to-black text-white w-20 h-56 -mx-4 z-10 relative shadow-2xl border border-slate-700"
-            : "bg-gradient-to-b from-white to-gray-50 text-slate-900 w-28 h-80 border border-gray-300 shadow-lg"
+            ? "bg-gradient-to-b from-neutral-900 to-black text-white w-14 h-40 -mx-3 transform-gpu -translate-y-8 z-20 relative shadow-2xl border border-neutral-700 rounded-md"
+            : "bg-gradient-to-b from-white to-neutral-50 text-neutral-900 w-24 h-64 z-10 border border-neutral-200 shadow-lg rounded-b-md"
         }
         ${isPressed ? (isBlack ? "from-slate-700 to-slate-900 shadow-inner scale-[0.98]" : "from-gray-100 to-gray-200 shadow-inner scale-[0.98]") : ""}
         flex flex-col items-center justify-end pb-6 cursor-pointer
         transition-all duration-150 ease-out hover:shadow-xl
-        ${isBlack ? "hover:from-slate-800 hover:to-slate-900" : "hover:from-gray-50 hover:to-gray-100"}
-        rounded-b-sm relative overflow-hidden
+        ${isBlack ? "hover:from-neutral-800 hover:to-neutral-900" : "hover:from-neutral-50 hover:to-white"}
+        rounded-b-sm relative overflow-hidden min-w-0
       `}
       onClick={onClick}
     >
       {section && (
         <div className="text-center mb-4">
           <div
-            className={`text-xs font-medium tracking-wider uppercase px-1 max-w-full overflow-hidden text-ellipsis whitespace-nowrap ${
-              isBlack ? "text-gray-300" : "text-slate-700"
-            } ${isPressed ? "opacity-100" : "opacity-80"} transition-all duration-150`}
+            className={`font-semibold ${labelSizeClass} normal-case tracking-normal px-3 py-1.5 max-w-full overflow-hidden whitespace-normal break-words hyphens-auto text-center leading-snug shadow-sm ${
+              isBlack ? "text-white bg-white/20 border border-white/25 rounded-md" : "text-neutral-800 bg-black/10 border border-black/10 rounded-md"
+            } ${isPressed ? "opacity-100" : "opacity-90"} transition-all duration-150`}
+            title={section}
           >
-            {section}
+            {displaySection}
           </div>
         </div>
       )}
 
       <span
-        className={`relative z-10 font-semibold tracking-wide text-lg block w-full text-center leading-none select-none pointer-events-none ${
-          isBlack ? "text-white" : "text-slate-900"
+        className={`relative z-10 font-bold ${isBlack ? "text-base" : "text-lg"} block w-full text-center leading-tight select-none pointer-events-none px-1 ${
+          isBlack ? "text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.6)]" : "text-neutral-900"
         } ${isPressed ? "scale-95" : ""} transition-transform duration-150`}
       >
         {note}
@@ -292,13 +301,13 @@ export default function InteractiveResume() {
       </div>
 
       <div className="flex items-center justify-center">
-        <div className="bg-gradient-to-b from-slate-800 to-slate-900 p-12 rounded-lg shadow-2xl border border-slate-700">
+        <div className="bg-gradient-to-b from-neutral-800 to-neutral-900 p-8 rounded-lg shadow-2xl border border-neutral-700">
           <div className="text-center mb-8">
             <h2 className="text-2xl font-semibold text-white mb-2 tracking-wide">Professional Portfolio</h2>
-            <p className="text-slate-300 text-sm font-medium">Select a section to view details</p>
+            <p className="text-neutral-300 text-sm font-medium">Select a section to view details</p>
           </div>
 
-          <div className="flex relative justify-center">
+          <div className="flex relative justify-center gap-1">
             {pianoKeys.map((key, index) => (
               <PianoKey
                 key={index}
