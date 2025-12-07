@@ -23,10 +23,13 @@ const PianoKey = ({
     Certifications: "Certs",
     Leadership: "Leader",
     Management: "Mgmt",
+    Projects: "Proj",
   }
   const displaySection = section ? (labelMap[section] ?? section) : section
   const isLeadership = displaySection === "Leadership"
-  const labelSizeClass = isBlack ? (isLeadership ? "text-[12px]" : "text-[11px]") : (isLeadership ? "text-[12px]" : "text-[12px]")
+  const labelSizeClass = isBlack
+    ? (isLeadership ? "text-[10px] sm:text-[11px] md:text-[12px]" : "text-[8px] xs:text-[9px] sm:text-[10px] md:text-[12px]")
+    : (isLeadership ? "text-[11px] sm:text-[12px]" : "text-[9px] sm:text-[10px] md:text-[12px]")
   return (
     <div
       className={`
