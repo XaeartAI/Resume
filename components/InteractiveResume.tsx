@@ -31,8 +31,8 @@ const PianoKey = ({
       className={`
         ${
           isBlack
-            ? "bg-gradient-to-b from-neutral-900 to-black text-white w-14 h-40 -mx-3 transform-gpu -translate-y-8 z-20 relative shadow-2xl border border-neutral-700 rounded-md"
-            : "bg-gradient-to-b from-white to-neutral-50 text-neutral-900 w-24 h-64 z-10 border border-neutral-200 shadow-lg rounded-b-md"
+            ? "snap-center bg-gradient-to-b from-neutral-900 to-black text-white w-8 md:w-12 lg:w-14 h-28 md:h-36 lg:h-40 -mx-2 md:-mx-3 transform-gpu -translate-y-6 md:-translate-y-8 z-20 relative shadow-2xl border border-neutral-700 rounded-md"
+            : "snap-center bg-gradient-to-b from-white to-neutral-50 text-neutral-900 w-12 md:w-20 lg:w-24 h-48 md:h-56 lg:h-64 z-10 border border-neutral-200 shadow-lg rounded-b-md"
         }
         ${isPressed ? (isBlack ? "from-slate-700 to-slate-900 shadow-inner scale-[0.98]" : "from-gray-100 to-gray-200 shadow-inner scale-[0.98]") : ""}
         flex flex-col items-center justify-end pb-6 cursor-pointer
@@ -45,9 +45,9 @@ const PianoKey = ({
       {section && (
         <div className="text-center mb-4">
           <div
-            className={`font-semibold ${labelSizeClass} normal-case tracking-normal px-3 py-1.5 max-w-full overflow-hidden whitespace-normal break-words hyphens-auto text-center leading-snug shadow-sm ${
+            className={`font-semibold ${labelSizeClass} normal-case tracking-normal px-2 md:px-3 py-1 max-w-full overflow-hidden whitespace-normal break-words hyphens-auto text-center leading-snug shadow-sm ${
               isBlack ? "text-white bg-white/20 border border-white/25 rounded-md" : "text-neutral-800 bg-black/10 border border-black/10 rounded-md"
-            } ${isPressed ? "opacity-100" : "opacity-90"} transition-all duration-150`}
+            } ${isPressed ? "opacity-100" : "opacity-90"} transition-all duration-150 text-[10px] sm:text-[11px] md:text-[12px]`}
             title={section}
           >
             {displaySection}
@@ -56,7 +56,7 @@ const PianoKey = ({
       )}
 
       <span
-        className={`relative z-10 font-bold ${isBlack ? "text-base" : "text-lg"} block w-full text-center leading-tight select-none pointer-events-none px-1 ${
+        className={`relative z-10 font-bold ${isBlack ? "text-sm md:text-base" : "text-base md:text-lg"} block w-full text-center leading-tight select-none pointer-events-none px-1 ${
           isBlack ? "text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.6)]" : "text-neutral-900"
         } ${isPressed ? "scale-95" : ""} transition-transform duration-150`}
       >
@@ -301,28 +301,29 @@ export default function InteractiveResume() {
       </div>
 
       <div className="flex items-center justify-center">
-        <div className="bg-gradient-to-b from-neutral-800 to-neutral-900 p-8 rounded-lg shadow-2xl border border-neutral-700">
+        <div className="bg-gradient-to-b from-neutral-800 to-neutral-900 p-4 md:p-8 rounded-lg shadow-2xl border border-neutral-700">
           <div className="text-center mb-8">
             <h2 className="text-2xl font-semibold text-white mb-2 tracking-wide">Professional Portfolio</h2>
             <p className="text-neutral-300 text-sm font-medium">Select a section to view details</p>
           </div>
-
-          <div className="flex relative justify-center gap-1">
-            {pianoKeys.map((key, index) => (
-              <PianoKey
-                key={index}
-                note={key.note}
-                isBlack={key.isBlack}
-                isPressed={pressedKeys.includes(key.note)}
-                section={key.section}
-                onClick={(event) => {
-                  const section = sections.find((s) => s.label === key.section)
-                  if (event) {
-                    playNote(key.note, section?.id, event)
-                  }
-                }}
-              />
-            ))}
+          <div className="relative w-full overflow-x-auto snap-x snap-mandatory">
+            <div className="inline-flex justify-center gap-1 md:gap-1.5 lg:gap-2 px-2 origin-center scale-[0.9] xs:scale-95 sm:scale-95 md:scale-100">
+              {pianoKeys.map((key, index) => (
+                <PianoKey
+                  key={index}
+                  note={key.note}
+                  isBlack={key.isBlack}
+                  isPressed={pressedKeys.includes(key.note)}
+                  section={key.section}
+                  onClick={(event) => {
+                    const section = sections.find((s) => s.label === key.section)
+                    if (event) {
+                      playNote(key.note, section?.id, event)
+                    }
+                  }}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -335,9 +336,9 @@ export default function InteractiveResume() {
               if (e.button === 0) closeModal()
             }}
           />
-          <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-40 animate-in slide-in-from-bottom-2 duration-300 fade-in">
+          <div className="absolute bottom-2 md:bottom-8 left-1/2 transform -translate-x-1/2 z-40 animate-in slide-in-from-bottom-2 duration-300 fade-in w-[92vw] md:w-auto">
             <div
-              className="bg-white border border-gray-300 rounded-lg p-8 max-w-4xl mx-auto shadow-xl"
+              className="bg-white border border-gray-300 rounded-lg p-4 md:p-8 max-w-[92vw] md:max-w-4xl mx-auto shadow-xl"
               onMouseDown={(e) => {
                 if (e.button === 0) closeModal()
               }}
@@ -358,14 +359,30 @@ export default function InteractiveResume() {
               return content ? (
                 <div className="text-left">
                   <div className="flex items-center gap-3 mb-4">
-                    <IconComponent className="w-5 h-5 text-slate-600" />
-                    <h3 className="text-xl font-semibold text-slate-900">{content.title}</h3>
+                      <IconComponent className="w-5 h-5 text-neutral-600" />
+                      <h3 className="text-xl font-semibold text-neutral-900">{content.title}</h3>
                   </div>
-                  <p className="text-slate-700 leading-relaxed font-medium max-w-3xl">{content.content}</p>
+                    {(() => {
+                      const items = (content.content || "")
+                        .split("•")
+                        .map((t) => t.trim())
+                        .filter(Boolean)
+                      return items.length > 1 ? (
+                        <ul className="list-disc pl-5 md:pl-6 space-y-1.5 text-neutral-700 leading-relaxed font-medium max-w-3xl">
+                          {items.map((item, idx) => (
+                            <li key={idx}>{item}</li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className="text-neutral-700 leading-relaxed font-medium max-w-3xl">
+                          {content.content}
+                        </p>
+                      )
+                    })()}
                 </div>
               ) : (
                 <div className="text-center">
-                  <p className="text-slate-500">Content not available</p>
+                    <p className="text-neutral-500">Content not available</p>
                 </div>
               )
             })()}
