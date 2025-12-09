@@ -149,6 +149,8 @@ export default function InteractiveResume() {
     }
   }, [activeSection])
 
+  // Keep mobile keyboard open even when a modal opens; modals will overlay it via z-index
+
   // Track orientation and viewport size to gate portrait on small devices
   useEffect(() => {
     if (typeof window === "undefined") return
@@ -504,7 +506,7 @@ export default function InteractiveResume() {
       {!isMobileKeyboardOpen && (
         <button
           type="button"
-          className="lg:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-40 px-4 py-2 rounded-full bg-indigo-600 text-white shadow-lg hover:bg-indigo-500 active:scale-95 transition"
+          className="lg:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-30 px-4 py-2 rounded-full bg-indigo-600 text-white shadow-lg hover:bg-indigo-500 active:scale-95 transition"
           onClick={() => setIsMobileKeyboardOpen(true)}
           aria-label="Open keyboard"
         >
@@ -519,11 +521,11 @@ export default function InteractiveResume() {
       {isMobileKeyboardOpen && (
         <>
           <div
-            className="lg:hidden fixed inset-0 z-40 bg-black/30"
+            className="lg:hidden fixed inset-0 z-20 bg-black/30"
             onClick={() => setIsMobileKeyboardOpen(false)}
             aria-hidden="true"
           />
-          <div className="lg:hidden fixed inset-x-0 bottom-0 z-50">
+          <div className="lg:hidden fixed inset-x-0 bottom-0 z-30">
             <div className="mx-auto w-full max-w-7xl">
               <div className="rounded-t-2xl border border-neutral-300 dark:border-neutral-700 bg-gradient-to-b from-neutral-100 to-neutral-200 dark:from-neutral-800 dark:to-neutral-900 shadow-2xl">
                 <div className="flex items-center justify-between px-4 pt-3 pb-2">
