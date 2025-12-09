@@ -65,11 +65,11 @@ const PianoKey = ({
       className={`
         ${
           isBlack
-            ? "bg-gradient-to-b from-slate-900 to-black text-white w-8 h-28 -mx-1 transform-gpu -translate-y-6 md:w-14 md:h-40 md:-mx-3 md:-translate-y-8 z-20 relative shadow-2xl border border-slate-700 rounded-md"
-            : "bg-gradient-to-b from-white to-gray-50 text-slate-900 w-12 h-48 md:w-24 md:h-64 z-10 border border-gray-300 shadow-lg rounded-b-md"
+            ? "bg-gradient-to-b from-slate-900 to-black text-white w-8 h-32 -mx-1 transform-gpu -translate-y-6 md:w-14 md:h-40 md:-mx-3 md:-translate-y-8 z-20 relative shadow-2xl border border-slate-700 rounded-md"
+            : "bg-gradient-to-b from-white to-gray-50 text-slate-900 w-12 h-56 md:w-24 md:h-64 z-10 border border-gray-300 shadow-lg rounded-b-md"
         }
         ${isPressed ? (isBlack ? "from-slate-700 to-slate-900 shadow-inner scale-[0.98]" : "from-gray-100 to-gray-200 shadow-inner scale-[0.98]") : ""}
-        flex flex-col items-center justify-end pb-6 cursor-pointer
+        flex flex-col items-center justify-end pb-7 cursor-pointer
         transition-all duration-150 ease-out hover:shadow-xl
         ${isBlack ? "hover:from-neutral-800 hover:to-neutral-900" : "hover:from-neutral-50 hover:to-white dark:hover:from-neutral-100 dark:hover:to-white"}
         rounded-b-sm relative overflow-hidden
@@ -582,7 +582,7 @@ export default function InteractiveResume() {
           />
           <div className="lg:hidden fixed inset-x-0 bottom-0 z-30">
             <div className="w-full">
-              <div className="rounded-t-2xl border border-neutral-300 dark:border-neutral-700 bg-gradient-to-b from-neutral-100 to-neutral-200 dark:from-neutral-800 dark:to-neutral-900 shadow-2xl max-h-[70vh] overflow-hidden">
+              <div className="rounded-t-2xl border border-neutral-300 dark:border-neutral-700 bg-gradient-to-b from-neutral-100 to-neutral-200 dark:from-neutral-800 dark:to-neutral-900 shadow-2xl max-h-[82vh] overflow-hidden">
                 <div className="flex items-center justify-between px-4 pt-3 pb-2">
                   <div className="mx-auto h-1.5 w-12 rounded-full bg-neutral-300 dark:bg-neutral-700" />
                   <button
