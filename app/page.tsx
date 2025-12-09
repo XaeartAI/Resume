@@ -312,7 +312,11 @@ export default function InteractiveResume() {
         B: 493.88,
       }
 
-      const frequency = noteFrequencies[note]
+      let frequency = noteFrequencies[note]
+      // For the final "Resolution" C, play one octave higher
+      if (frequency && sectionId === "resolution") {
+        frequency = frequency * 2
+      }
       if (frequency) {
         const oscillator = audioContext.createOscillator()
         const gainNode = audioContext.createGain()
