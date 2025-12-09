@@ -35,8 +35,8 @@ const PianoKey = ({
       className={`
         ${
           isBlack
-            ? "bg-gradient-to-b from-slate-900 to-black text-white w-10 h-28 -mx-1 transform-gpu -translate-y-6 md:w-14 md:h-40 md:-mx-3 md:-translate-y-8 z-20 relative shadow-2xl border border-slate-700 rounded-md"
-            : "bg-gradient-to-b from-white to-gray-50 text-slate-900 w-16 h-48 md:w-24 md:h-64 z-10 border border-gray-300 shadow-lg rounded-b-md"
+            ? "bg-gradient-to-b from-slate-900 to-black text-white w-8 h-28 -mx-1 transform-gpu -translate-y-6 md:w-14 md:h-40 md:-mx-3 md:-translate-y-8 z-20 relative shadow-2xl border border-slate-700 rounded-md"
+            : "bg-gradient-to-b from-white to-gray-50 text-slate-900 w-12 h-48 md:w-24 md:h-64 z-10 border border-gray-300 shadow-lg rounded-b-md"
         }
         ${isPressed ? (isBlack ? "from-slate-700 to-slate-900 shadow-inner scale-[0.98]" : "from-gray-100 to-gray-200 shadow-inner scale-[0.98]") : ""}
         flex flex-col items-center justify-end pb-6 cursor-pointer
@@ -49,7 +49,7 @@ const PianoKey = ({
       {section && (
         <div className="text-center mb-4">
           <div
-            className={`font-semibold ${labelSizeClass} normal-case tracking-normal px-1 md:px-3 py-1 w-full max-w-full box-border overflow-hidden whitespace-normal break-words ${isBlack ? "break-all" : ""} hyphens-auto text-center leading-snug shadow-sm ${isBlack ? "text-white bg-white/20 border border-white/25 rounded-md" : "text-neutral-800 dark:text-neutral-900 bg-black/5 dark:bg-white/60 border border-black/10 dark:border-white/40 rounded-md"} ${isPressed ? "opacity-100" : "opacity-90"} transition-all duration-150`}
+            className={`font-semibold ${labelSizeClass} normal-case tracking-normal px-1 md:px-2 py-1 w-full max-w-full box-border truncate whitespace-nowrap text-center leading-snug shadow-sm ${isBlack ? "text-white bg-white/20 border border-white/25 rounded-md" : "text-neutral-800 dark:text-neutral-900 bg-black/5 dark:bg-white/60 border border-black/10 dark:border-white/40 rounded-md"} ${isPressed ? "opacity-100" : "opacity-90"} transition-all duration-150`}
             title={section}
           >
             {displaySection}
@@ -58,7 +58,7 @@ const PianoKey = ({
       )}
 
       <span
-        className={`relative z-10 font-bold ${isBlack ? "text-sm md:text-base" : "text-base md:text-lg"} block w-full text-center leading-tight select-none pointer-events-none px-1 ${isBlack ? "text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.6)]" : "text-neutral-900 dark:text-neutral-900"} ${isPressed ? "scale-95" : ""} transition-transform duration-150`}
+        className={`relative z-10 font-bold ${isBlack ? "text-sm md:text-base" : "text-base md:text-lg"} block w-full text-center leading-tight select-none pointer-events-none px-1 whitespace-nowrap ${isBlack ? "text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.6)]" : "text-neutral-900 dark:text-neutral-900"} ${isPressed ? "scale-95" : ""} transition-transform duration-150`}
       >
         {note}
       </span>
@@ -78,6 +78,8 @@ export default function InteractiveResume() {
   const keyboardInnerRef = useRef<HTMLDivElement | null>(null)
   const [keyboardScale, setKeyboardScale] = useState(1)
   const [isMobileKeyboardOpen, setIsMobileKeyboardOpen] = useState(false)
+  const [showOrientationHint, setShowOrientationHint] = useState(false)
+  const [hasDismissedOrientationHint, setHasDismissedOrientationHint] = useState(false)
 
   useEffect(() => {
     setMounted(true)
@@ -136,6 +138,22 @@ export default function InteractiveResume() {
     }
   }, [])
 
+  // Recalculate scale when mobile keyboard panel opens (layout size changes)
+  useEffect(() => {
+    if (!isMobileKeyboardOpen) return
+    const t = window.setTimeout(() => {
+      const wrapper = keyboardWrapperRef.current
+      const inner = keyboardInnerRef.current
+      if (!wrapper || !inner) return
+      const available = wrapper.clientWidth
+      const needed = inner.scrollWidth
+      if (needed === 0) return
+      const scale = Math.min(1, available / needed)
+      setKeyboardScale(scale)
+    }, 50)
+    return () => window.clearTimeout(t)
+  }, [isMobileKeyboardOpen])
+
   useEffect(() => {
     if (!activeSection) return
     const handleMouseDown = (event: MouseEvent) => {
@@ -173,6 +191,21 @@ export default function InteractiveResume() {
       window.removeEventListener("orientationchange", handleChange)
     }
   }, [])
+
+  // Default to landscape guidance on mobile portrait
+  useEffect(() => {
+    if (typeof window === "undefined") return
+    const dismissed = window.sessionStorage.getItem("orientationHintDismissed") === "true"
+    setHasDismissedOrientationHint(dismissed)
+  }, [])
+
+  useEffect(() => {
+    if (isSmallViewport && isPortrait && !hasDismissedOrientationHint) {
+      setShowOrientationHint(true)
+    } else {
+      setShowOrientationHint(false)
+    }
+  }, [isSmallViewport, isPortrait, hasDismissedOrientationHint])
 
   const sections = [
     { id: "summary", label: "Summary", note: "C", icon: User },
@@ -384,7 +417,38 @@ export default function InteractiveResume() {
 
   return (
     <div className={"fixed inset-0 bg-gradient-to-br from-neutral-50 to-neutral-100 dark:from-neutral-950 dark:to-black flex flex-col items-center overflow-x-hidden overflow-y-auto"}>
-      {/* Removed portrait blocking overlay to allow mobile keyboard access */}
+      {/* Orientation hint overlay for small screens in portrait */}
+      {showOrientationHint && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/95 dark:bg-neutral-950/95 backdrop-blur-sm">
+          <div className="text-center px-6 w-full max-w-sm">
+            <div className="mx-auto mb-4 h-12 w-12 rounded-full border border-neutral-300 dark:border-neutral-700 flex items-center justify-center">
+              <svg viewBox="0 0 24 24" className="h-6 w-6 text-neutral-800 dark:text-neutral-200" fill="none" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 7a2 2 0 012-2h6l4 4v8a2 2 0 01-2 2H6a2 2 0 01-2-2V7z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M14 5v4h4" />
+              </svg>
+            </div>
+            <h2 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-1">Rotate your device</h2>
+            <p className="text-neutral-700 dark:text-neutral-300 text-sm mb-4">
+              For the best experience, please rotate to landscape. You can continue in portrait if you prefer.
+            </p>
+            <div className="flex gap-2 justify-center">
+              <button
+                type="button"
+                className="px-3 py-2 rounded-md border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800/60 text-sm"
+                onClick={() => {
+                  setHasDismissedOrientationHint(true)
+                  if (typeof window !== "undefined") {
+                    window.sessionStorage.setItem("orientationHintDismissed", "true")
+                  }
+                  setShowOrientationHint(false)
+                }}
+              >
+                Continue in portrait
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <div className={"sticky top-0 left-0 right-0 p-4 md:p-6 backdrop-blur-sm z-30 border-b bg-white/90 dark:bg-neutral-900/80 border-neutral-200 dark:border-neutral-800"}>
         <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center max-w-7xl mx-auto w-full max-w-full overflow-x-hidden">
           <div>
@@ -461,7 +525,7 @@ export default function InteractiveResume() {
                 className="w-full flex items-center justify-center gap-2 rounded-md bg-indigo-600 text-white hover:bg-indigo-500 px-3 py-2 text-sm font-medium min-w-0 overflow-hidden"
               >
                 <Building className="w-4 h-4" />
-                <span className="min-w-0 whitespace-normal break-words break-all text-center leading-snug">Build &amp; Serve</span>
+                <span className="flex-1 min-w-0 whitespace-nowrap truncate text-center leading-snug">Build &amp; Serve</span>
               </a>
             </div>
           </div>
@@ -479,8 +543,8 @@ export default function InteractiveResume() {
           <div className="relative w-full overflow-x-hidden snap-x snap-mandatory" ref={keyboardWrapperRef}>
             <div
               ref={keyboardInnerRef}
-              className="inline-flex justify-center gap-0.5 sm:gap-1 md:gap-1.5 lg:gap-2 px-2 origin-center"
-              style={{ transform: `scale(${keyboardScale})`, transformOrigin: "center", willChange: "transform" }}
+              className="inline-flex justify-center gap-0 sm:gap-0.5 md:gap-1 lg:gap-2 px-0 origin-left"
+              style={{ transform: `scale(${keyboardScale})`, transformOrigin: "left", willChange: "transform" }}
             >
               {pianoKeys.map((key, index) => (
                 <PianoKey
@@ -506,7 +570,8 @@ export default function InteractiveResume() {
       {!isMobileKeyboardOpen && (
         <button
           type="button"
-          className="lg:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-30 px-4 py-2 rounded-full bg-indigo-600 text-white shadow-lg hover:bg-indigo-500 active:scale-95 transition"
+          className="lg:hidden fixed left-1/2 -translate-x-1/2 z-30 px-4 py-2 rounded-full bg-indigo-600 text-white shadow-lg hover:bg-indigo-500 active:scale-95 transition"
+          style={{ bottom: "calc(1rem + env(safe-area-inset-bottom))" }}
           onClick={() => setIsMobileKeyboardOpen(true)}
           aria-label="Open keyboard"
         >
@@ -527,7 +592,7 @@ export default function InteractiveResume() {
           />
           <div className="lg:hidden fixed inset-x-0 bottom-0 z-30">
             <div className="mx-auto w-full max-w-7xl">
-              <div className="rounded-t-2xl border border-neutral-300 dark:border-neutral-700 bg-gradient-to-b from-neutral-100 to-neutral-200 dark:from-neutral-800 dark:to-neutral-900 shadow-2xl">
+              <div className="rounded-t-2xl border border-neutral-300 dark:border-neutral-700 bg-gradient-to-b from-neutral-100 to-neutral-200 dark:from-neutral-800 dark:to-neutral-900 shadow-2xl max-h-[70vh] overflow-hidden">
                 <div className="flex items-center justify-between px-4 pt-3 pb-2">
                   <div className="mx-auto h-1.5 w-12 rounded-full bg-neutral-300 dark:bg-neutral-700" />
                   <button
@@ -539,7 +604,7 @@ export default function InteractiveResume() {
                     <ChevronDown className="w-5 h-5" />
                   </button>
                 </div>
-                <div className="px-4 pb-3">
+                <div className="px-4 pb-3" style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}>
                   <div className="text-center mb-4">
                     <h2 className="text-base font-semibold text-neutral-950 dark:text-neutral-300 tracking-wide">Professional Portfolio</h2>
                     <p className="text-neutral-600 dark:text-neutral-400 text-xs font-medium">Select a section to view details</p>
@@ -547,8 +612,8 @@ export default function InteractiveResume() {
                   <div className="relative w-full overflow-x-hidden snap-x snap-mandatory" ref={keyboardWrapperRef}>
                     <div
                       ref={keyboardInnerRef}
-                      className="inline-flex justify-center gap-0.5 sm:gap-1 md:gap-1.5 lg:gap-2 px-2 origin-center"
-                      style={{ transform: `scale(${keyboardScale})`, transformOrigin: "center", willChange: "transform" }}
+                      className="inline-flex justify-center gap-0 sm:gap-0.5 md:gap-1 lg:gap-2 px-0 origin-left"
+                      style={{ transform: `scale(${keyboardScale})`, transformOrigin: "left", willChange: "transform" }}
                     >
                       {pianoKeys.map((key, index) => (
                         <PianoKey
