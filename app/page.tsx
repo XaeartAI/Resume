@@ -19,6 +19,9 @@ const PianoKey = ({
   onClick?: () => void
   section?: string
 }) => {
+  const keyRef = useRef<HTMLDivElement | null>(null)
+  const labelTextRef = useRef<HTMLSpanElement | null>(null)
+  const [labelScale, setLabelScale] = useState(1)
   const labelMap: Record<string, string> = {
     Certifications: "Certs",
     Leadership: "Leader",
@@ -28,8 +31,35 @@ const PianoKey = ({
   const displaySection = section ? (labelMap[section] ?? section) : section
   const isLeadership = displaySection === "Leadership"
   const labelSizeClass = isBlack
-    ? (isLeadership ? "text-[10px] sm:text-[11px] md:text-[12px]" : "text-[8px] xs:text-[9px] sm:text-[10px] md:text-[12px]")
-    : (isLeadership ? "text-[11px] sm:text-[12px]" : "text-[9px] sm:text-[10px] md:text-[12px]")
+    ? (isLeadership ? "text-[9px] xs:text-[10px] sm:text-[11px] md:text-[12px]" : "text-[7px] xs:text-[8px] sm:text-[10px] md:text-[12px]")
+    : (isLeadership ? "text-[10px] sm:text-[12px]" : "text-[8px] sm:text-[10px] md:text-[12px]")
+
+  // Dynamically scale slanted label to fit within key width on small screens
+  useEffect(() => {
+    const recalcLabelScale = () => {
+      const keyWidth = keyRef.current?.clientWidth ?? 0
+      const textEl = labelTextRef.current
+      if (!keyWidth || !textEl) return
+      const currentScale = labelScale || 1
+      const rect = textEl.getBoundingClientRect()
+      const scaledWidth = rect.width
+      const unscaledWidth = scaledWidth / currentScale
+      const paddingAllowance = 2 // tighter allowance for mobile
+      const available = Math.max(8, keyWidth - paddingAllowance)
+      const neededScale = Math.min(1, available / unscaledWidth)
+      const clamped = Math.max(0.2, Math.min(1, neededScale))
+      if (Math.abs(clamped - labelScale) > 0.02) {
+        setLabelScale(clamped)
+      }
+    }
+    recalcLabelScale()
+    window.addEventListener("resize", recalcLabelScale)
+    window.addEventListener("orientationchange", recalcLabelScale)
+    return () => {
+      window.removeEventListener("resize", recalcLabelScale)
+      window.removeEventListener("orientationchange", recalcLabelScale)
+    }
+  }, [displaySection, isBlack, labelScale])
   return (
     <div
       className={`
@@ -45,17 +75,26 @@ const PianoKey = ({
         rounded-b-sm relative overflow-hidden
       `}
       onClick={onClick}
+      ref={keyRef}
     >
       {section && (
-        <div className="text-center mb-4">
+        <div className="text-center mb-2 sm:mb-4">
           <div
-            className={`font-semibold ${labelSizeClass} normal-case tracking-normal px-1 md:px-2 py-1 w-full max-w-full box-border text-center leading-snug shadow-sm
-            ${isBlack ? "text-white bg-white/20 border border-white/25 rounded-md" : "text-neutral-800 dark:text-neutral-900 bg-black/5 dark:bg-white/60 border border-black/10 dark:border-white/40 rounded-md"}
+            className={`font-semibold ${labelSizeClass} normal-case tracking-normal box-border text-center leading-snug
+            ${isBlack ? "text-white" : "text-neutral-800 dark:text-neutral-900"}
             ${isPressed ? "opacity-100" : "opacity-90"} transition-all duration-150
-            inline-block overflow-visible whitespace-nowrap -rotate-45 origin-bottom-left sm:rotate-0 sm:origin-center sm:overflow-hidden sm:truncate`}
+            inline-block mx-auto w-fit whitespace-nowrap rotate-[-20deg] origin-bottom-left sm:rotate-0 sm:origin-center
+            px-0 py-0 sm:px-2 sm:py-1
+            sm:shadow-sm ${isBlack ? "sm:bg-white/20 sm:border sm:border-white/25 sm:rounded-md" : "sm:bg-black/5 sm:dark:bg-white/60 sm:border sm:border-black/10 sm:dark:border-white/40 sm:rounded-md"}`}
             title={section}
           >
-            {displaySection}
+            <span
+              ref={labelTextRef}
+              className="inline-block whitespace-nowrap"
+              style={{ transform: `scale(${labelScale})` }}
+            >
+              {displaySection}
+            </span>
           </div>
         </div>
       )}
@@ -128,7 +167,7 @@ export default function InteractiveResume() {
     }
   }, [])
 
-  // Ensure the keyboard fits horizontally on small screens by scaling it down
+  // Ensure the keyboard fits horizontally; on small screens also scale up to fill width
   useEffect(() => {
     const recalcScale = () => {
       const wrapper = keyboardWrapperRef.current
@@ -137,7 +176,10 @@ export default function InteractiveResume() {
       const available = wrapper.clientWidth
       const needed = inner.scrollWidth
       if (needed === 0) return
-      const scale = Math.min(1, available / needed)
+      const ratio = available / needed
+      const allowUpscale = typeof window !== "undefined" && window.matchMedia("(max-width: 1023px)").matches
+      const target = allowUpscale ? ratio : Math.min(1, ratio)
+      const scale = Math.max(0.5, Math.min(1.3, target))
       setKeyboardScale(scale)
     }
     recalcScale()
@@ -160,7 +202,10 @@ export default function InteractiveResume() {
       const available = wrapper.clientWidth
       const needed = inner.scrollWidth
       if (needed === 0) return
-      const scale = Math.min(1, available / needed)
+      const ratio = available / needed
+      const allowUpscale = typeof window !== "undefined" && window.matchMedia("(max-width: 1023px)").matches
+      const target = allowUpscale ? ratio : Math.min(1, ratio)
+      const scale = Math.max(0.5, Math.min(1.3, target))
       setKeyboardScale(scale)
     }, 50)
     return () => window.clearTimeout(t)
@@ -549,8 +594,8 @@ export default function InteractiveResume() {
                     <ChevronDown className="w-5 h-5" />
                   </button>
                 </div>
-                <div className="px-4 pb-3" style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}>
-                  <div className="text-center mb-4">
+                <div className="px-0 sm:px-4 pb-3" style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}>
+                  <div className="text-center mb-4 px-4 sm:px-0">
                     <h2 className="text-base font-semibold text-neutral-950 dark:text-neutral-300 tracking-wide">Professional Portfolio</h2>
                     <p className="text-neutral-600 dark:text-neutral-400 text-xs font-medium">Select a section to view details</p>
                   </div>
