@@ -74,6 +74,9 @@ export default function InteractiveResume() {
   const [isPortrait, setIsPortrait] = useState(false)
   const [isSmallViewport, setIsSmallViewport] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const keyboardWrapperRef = useRef<HTMLDivElement | null>(null)
+  const keyboardInnerRef = useRef<HTMLDivElement | null>(null)
+  const [keyboardScale, setKeyboardScale] = useState(1)
 
   useEffect(() => {
     setMounted(true)
@@ -107,6 +110,28 @@ export default function InteractiveResume() {
       document.removeEventListener("keydown", handleFirstInteraction)
       document.removeEventListener("touchstart", handleFirstInteraction)
       document.removeEventListener("pointerdown", handleFirstInteraction)
+    }
+  }, [])
+
+  // Ensure the keyboard fits horizontally on small screens by scaling it down
+  useEffect(() => {
+    const recalcScale = () => {
+      const wrapper = keyboardWrapperRef.current
+      const inner = keyboardInnerRef.current
+      if (!wrapper || !inner) return
+      const available = wrapper.clientWidth
+      const needed = inner.scrollWidth
+      if (needed === 0) return
+      const scale = Math.min(1, available / needed)
+      setKeyboardScale(scale)
+    }
+    recalcScale()
+    const onResize = () => recalcScale()
+    window.addEventListener("resize", onResize)
+    window.addEventListener("orientationchange", onResize)
+    return () => {
+      window.removeEventListener("resize", onResize)
+      window.removeEventListener("orientationchange", onResize)
     }
   }, [])
 
@@ -355,7 +380,7 @@ export default function InteractiveResume() {
   }, [])
 
   return (
-    <div className={"fixed inset-0 bg-gradient-to-br from-neutral-50 to-neutral-100 dark:from-neutral-950 dark:to-black flex flex-col items-center justify-center overflow-hidden"}>
+    <div className={"fixed inset-0 bg-gradient-to-br from-neutral-50 to-neutral-100 dark:from-neutral-950 dark:to-black flex flex-col items-center overflow-x-hidden overflow-y-auto"}>
       {(isPortrait && isSmallViewport) && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/95 dark:bg-neutral-950/95 backdrop-blur-sm">
           <div className="text-center px-6">
@@ -372,16 +397,16 @@ export default function InteractiveResume() {
           </div>
         </div>
       )}
-      <div className={"absolute top-0 left-0 right-0 p-4 md:p-6 backdrop-blur-sm z-30 border-b bg-white/90 dark:bg-neutral-900/80 border-neutral-200 dark:border-neutral-800"}>
-        <div className="flex justify-between items-center max-w-7xl mx-auto">
+      <div className={"sticky top-0 left-0 right-0 p-4 md:p-6 backdrop-blur-sm z-30 border-b bg-white/90 dark:bg-neutral-900/80 border-neutral-200 dark:border-neutral-800"}>
+        <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center max-w-7xl mx-auto w-full max-w-full overflow-x-hidden">
           <div>
-            <h1 className="text-2xl md:text-3xl font-semibold tracking-tight mb-1 text-neutral-950 dark:text-neutral-100 whitespace-nowrap">Justin Christopher Le</h1>
+            <h1 className="text-2xl md:text-3xl font-semibold tracking-tight mb-1 text-neutral-950 dark:text-neutral-100 break-words">Justin Christopher Le</h1>
             <p className="text-neutral-600 dark:text-neutral-300 text-base md:text-lg mb-1 font-medium">Senior Software Engineer • Charlotte, NC</p>
             <div className="text-neutral-500 dark:text-neutral-400 text-sm font-medium">
               7+ Years Experience • Full-Stack Development • Enterprise Solutions
             </div>
           </div>
-          <div className="flex gap-3">
+          <div className="flex gap-3 flex-col sm:flex-row w-full sm:w-auto">
             <Button
               size="lg"
               variant="outline"
@@ -413,7 +438,7 @@ export default function InteractiveResume() {
             </Button>
             <Button
               size="lg"
-              className="bg-indigo-600 text-white hover:bg-indigo-500 font-medium text-sm md:text-base"
+              className="hidden sm:inline-flex bg-indigo-600 text-white hover:bg-indigo-500 font-medium text-sm md:text-base"
               onClick={() => window.open("https://BuildAndServe.com", "_blank")}
             >
               <Building className="w-4 h-4 mr-2" />
@@ -422,7 +447,7 @@ export default function InteractiveResume() {
             <Button
               size="lg"
               variant="outline"
-              className="sm:hidden border-neutral-300 text-neutral-700 hover:bg-neutral-50 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-800 font-medium bg-transparent text-sm px-3 py-2"
+              className="sm:hidden w-full border-neutral-300 text-neutral-700 hover:bg-neutral-50 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-800 font-medium bg-transparent text-sm px-3 py-2"
               onClick={() => {
                 const current = resolvedTheme ?? theme
                 setTheme(current === "dark" ? "light" : "dark")
@@ -432,19 +457,42 @@ export default function InteractiveResume() {
               {mounted ? ((resolvedTheme ?? theme) === "dark" ? <Sun className="w-4 h-4 mr-2" /> : <Moon className="w-4 h-4 mr-2" />) : <Moon className="w-4 h-4 mr-2" />}
               {mounted ? (((resolvedTheme ?? theme) === "dark") ? "Light" : "Dark") : "Theme"}
             </Button>
+            {/* Mobile-only second line for Email and Build & Serve */}
+            <div className="sm:hidden w-full grid grid-cols-1 gap-2">
+              <a
+                href="mailto:JustinLe.Work@gmail.com"
+                className="w-full flex items-start justify-start gap-2 rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-[11px] font-medium text-neutral-700 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-neutral-800/60 text-left whitespace-normal break-words break-all min-w-0 overflow-hidden"
+              >
+                <Mail className="w-4 h-4 mt-0.5 shrink-0" />
+                <span className="min-w-0 break-words break-all leading-snug">JustinLe.Work@gmail.com</span>
+              </a>
+              <a
+                href="https://BuildAndServe.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full flex items-center justify-center gap-2 rounded-md bg-indigo-600 text-white hover:bg-indigo-500 px-3 py-2 text-sm font-medium min-w-0"
+              >
+                <Building className="w-4 h-4" />
+                <span className="truncate">Build & Serve</span>
+              </a>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="flex items-center justify-center">
+      <div className="flex items-center justify-center mt-6 md:mt-10">
         <div className={"bg-gradient-to-b from-neutral-100 to-neutral-200 dark:from-neutral-800 dark:to-neutral-900 p-4 md:p-8 rounded-lg shadow-2xl border border-neutral-300 dark:border-neutral-700"}>
           <div className="text-center mb-8">
             <h2 className="text-2xl font-semibold text-neutral-950 dark:text-neutral-400 mb-2 tracking-wide">Professional Portfolio</h2>
             <p className="text-neutral-600 dark:text-neutral-300 text-sm font-medium">Select a section to view details</p>
           </div>
 
-          <div className="relative w-full overflow-x-auto snap-x snap-mandatory">
-            <div className="inline-flex justify-center gap-0.5 sm:gap-1 md:gap-1.5 lg:gap-2 px-2 origin-center scale-[0.85] sm:scale-95 md:scale-100">
+          <div className="relative w-full overflow-x-hidden snap-x snap-mandatory" ref={keyboardWrapperRef}>
+            <div
+              ref={keyboardInnerRef}
+              className="inline-flex justify-center gap-0.5 sm:gap-1 md:gap-1.5 lg:gap-2 px-2 origin-center"
+              style={{ transform: `scale(${keyboardScale})`, transformOrigin: "center", willChange: "transform" }}
+            >
               {pianoKeys.map((key, index) => (
                 <PianoKey
                   key={index}
