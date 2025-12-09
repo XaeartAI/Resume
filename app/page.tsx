@@ -3,7 +3,7 @@
 import type React from "react"
 import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import { Mail, Phone, Code, Building, Award, User, Briefcase, GraduationCap, Moon, Sun } from "lucide-react"
+import { Mail, Phone, Code, Building, Award, User, Briefcase, GraduationCap, Moon, Sun, ChevronUp, ChevronDown } from "lucide-react"
 import { useTheme } from "next-themes"
 
 const PianoKey = ({
@@ -77,6 +77,7 @@ export default function InteractiveResume() {
   const keyboardWrapperRef = useRef<HTMLDivElement | null>(null)
   const keyboardInnerRef = useRef<HTMLDivElement | null>(null)
   const [keyboardScale, setKeyboardScale] = useState(1)
+  const [isMobileKeyboardOpen, setIsMobileKeyboardOpen] = useState(false)
 
   useEffect(() => {
     setMounted(true)
@@ -381,22 +382,7 @@ export default function InteractiveResume() {
 
   return (
     <div className={"fixed inset-0 bg-gradient-to-br from-neutral-50 to-neutral-100 dark:from-neutral-950 dark:to-black flex flex-col items-center overflow-x-hidden overflow-y-auto"}>
-      {(isPortrait && isSmallViewport) && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/95 dark:bg-neutral-950/95 backdrop-blur-sm">
-          <div className="text-center px-6">
-            <div className="mx-auto mb-4 h-10 w-10 rounded-full border border-neutral-300 dark:border-neutral-700 flex items-center justify-center">
-              <svg viewBox="0 0 24 24" className="h-5 w-5 text-neutral-800 dark:text-neutral-200" fill="none" stroke="currentColor" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4 7a2 2 0 012-2h6l4 4v8a2 2 0 01-2 2H6a2 2 0 01-2-2V7z" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M14 5v4h4" />
-              </svg>
-            </div>
-            <h2 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-1">Rotate your device</h2>
-            <p className="text-neutral-700 dark:text-neutral-300 text-sm max-w-sm">
-              For the best experience, please rotate to landscape.
-            </p>
-          </div>
-        </div>
-      )}
+      {/* Removed portrait blocking overlay to allow mobile keyboard access */}
       <div className={"sticky top-0 left-0 right-0 p-4 md:p-6 backdrop-blur-sm z-30 border-b bg-white/90 dark:bg-neutral-900/80 border-neutral-200 dark:border-neutral-800"}>
         <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center max-w-7xl mx-auto w-full max-w-full overflow-x-hidden">
           <div>
@@ -423,7 +409,7 @@ export default function InteractiveResume() {
             <Button
               size="lg"
               variant="outline"
-              className="hidden sm:inline-flex border-neutral-300 text-neutral-700 hover:bg-neutral-50 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-800 font-medium bg-transparent text-sm md:text-base px-3 py-2"
+              className="hidden lg:inline-flex border-neutral-300 text-neutral-700 hover:bg-neutral-50 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-800 font-medium bg-transparent text-sm md:text-base px-3 py-2"
             >
               <Phone className="w-4 h-4 mr-2" />
               704-996-9469
@@ -431,14 +417,14 @@ export default function InteractiveResume() {
             <Button
               size="lg"
               variant="outline"
-              className="hidden sm:inline-flex border-neutral-300 text-neutral-700 hover:bg-neutral-50 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-800 font-medium bg-transparent text-sm md:text-base px-3 py-2"
+              className="hidden lg:inline-flex border-neutral-300 text-neutral-700 hover:bg-neutral-50 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-800 font-medium bg-transparent text-sm md:text-base px-3 py-2"
             >
               <Mail className="w-4 h-4 mr-2" />
               JustinLe.Work@gmail.com
             </Button>
             <Button
               size="lg"
-              className="hidden sm:inline-flex bg-indigo-600 text-white hover:bg-indigo-500 font-medium text-sm md:text-base"
+              className="hidden lg:inline-flex bg-indigo-600 text-white hover:bg-indigo-500 font-medium text-sm md:text-base"
               onClick={() => window.open("https://BuildAndServe.com", "_blank")}
             >
               <Building className="w-4 h-4 mr-2" />
@@ -457,8 +443,8 @@ export default function InteractiveResume() {
               {mounted ? ((resolvedTheme ?? theme) === "dark" ? <Sun className="w-4 h-4 mr-2" /> : <Moon className="w-4 h-4 mr-2" />) : <Moon className="w-4 h-4 mr-2" />}
               {mounted ? (((resolvedTheme ?? theme) === "dark") ? "Light" : "Dark") : "Theme"}
             </Button>
-            {/* Mobile-only second line for Email and Build & Serve */}
-            <div className="sm:hidden w-full grid grid-cols-1 gap-2">
+            {/* Mobile/tablet second line for Email and Build & Serve */}
+            <div className="lg:hidden w-full grid grid-cols-1 gap-2">
               <a
                 href="mailto:JustinLe.Work@gmail.com"
                 className="w-full flex items-start justify-start gap-2 rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-[11px] font-medium text-neutral-700 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-neutral-800/60 text-left whitespace-normal break-words break-all min-w-0 overflow-hidden"
@@ -470,17 +456,18 @@ export default function InteractiveResume() {
                 href="https://BuildAndServe.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full flex items-center justify-center gap-2 rounded-md bg-indigo-600 text-white hover:bg-indigo-500 px-3 py-2 text-sm font-medium min-w-0"
+                className="w-full flex items-center justify-center gap-2 rounded-md bg-indigo-600 text-white hover:bg-indigo-500 px-3 py-2 text-sm font-medium min-w-0 overflow-hidden"
               >
                 <Building className="w-4 h-4" />
-                <span className="truncate">Build & Serve</span>
+                <span className="min-w-0 whitespace-normal break-words break-all text-center leading-snug">Build &amp; Serve</span>
               </a>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="flex items-center justify-center mt-6 md:mt-10">
+      {/* Desktop/tablet keyboard (visible on large screens and up) */}
+      <div className="hidden lg:flex items-center justify-center mt-6 md:mt-10">
         <div className={"bg-gradient-to-b from-neutral-100 to-neutral-200 dark:from-neutral-800 dark:to-neutral-900 p-4 md:p-8 rounded-lg shadow-2xl border border-neutral-300 dark:border-neutral-700"}>
           <div className="text-center mb-8">
             <h2 className="text-2xl font-semibold text-neutral-950 dark:text-neutral-400 mb-2 tracking-wide">Professional Portfolio</h2>
@@ -512,6 +499,78 @@ export default function InteractiveResume() {
           </div>
         </div>
       </div>
+
+      {/* Mobile open keyboard button */}
+      {!isMobileKeyboardOpen && (
+        <button
+          type="button"
+          className="lg:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-40 px-4 py-2 rounded-full bg-indigo-600 text-white shadow-lg hover:bg-indigo-500 active:scale-95 transition"
+          onClick={() => setIsMobileKeyboardOpen(true)}
+          aria-label="Open keyboard"
+        >
+          <div className="flex items-center gap-2">
+            <ChevronUp className="w-5 h-5" />
+            <span className="text-sm font-semibold">Open Keyboard</span>
+          </div>
+        </button>
+      )}
+
+      {/* Mobile slide-up keyboard panel */}
+      {isMobileKeyboardOpen && (
+        <>
+          <div
+            className="lg:hidden fixed inset-0 z-40 bg-black/30"
+            onClick={() => setIsMobileKeyboardOpen(false)}
+            aria-hidden="true"
+          />
+          <div className="lg:hidden fixed inset-x-0 bottom-0 z-50">
+            <div className="mx-auto w-full max-w-7xl">
+              <div className="rounded-t-2xl border border-neutral-300 dark:border-neutral-700 bg-gradient-to-b from-neutral-100 to-neutral-200 dark:from-neutral-800 dark:to-neutral-900 shadow-2xl">
+                <div className="flex items-center justify-between px-4 pt-3 pb-2">
+                  <div className="mx-auto h-1.5 w-12 rounded-full bg-neutral-300 dark:bg-neutral-700" />
+                  <button
+                    type="button"
+                    className="absolute right-3 top-2 rounded-md px-2 py-1 text-neutral-700 dark:text-neutral-300 hover:bg-black/5 dark:hover:bg-white/10"
+                    onClick={() => setIsMobileKeyboardOpen(false)}
+                    aria-label="Close keyboard"
+                  >
+                    <ChevronDown className="w-5 h-5" />
+                  </button>
+                </div>
+                <div className="px-4 pb-3">
+                  <div className="text-center mb-4">
+                    <h2 className="text-base font-semibold text-neutral-950 dark:text-neutral-300 tracking-wide">Professional Portfolio</h2>
+                    <p className="text-neutral-600 dark:text-neutral-400 text-xs font-medium">Select a section to view details</p>
+                  </div>
+                  <div className="relative w-full overflow-x-hidden snap-x snap-mandatory" ref={keyboardWrapperRef}>
+                    <div
+                      ref={keyboardInnerRef}
+                      className="inline-flex justify-center gap-0.5 sm:gap-1 md:gap-1.5 lg:gap-2 px-2 origin-center"
+                      style={{ transform: `scale(${keyboardScale})`, transformOrigin: "center", willChange: "transform" }}
+                    >
+                      {pianoKeys.map((key, index) => (
+                        <PianoKey
+                          key={index}
+                          note={key.note}
+                          isBlack={key.isBlack}
+                          isPressed={pressedKeys.includes(key.note)}
+                          section={key.section}
+                          onClick={(event) => {
+                            const section = sections.find((s) => s.label === key.section)
+                            if (event) {
+                              playNote(key.note, section?.id, event)
+                            }
+                          }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
 
       {activeSection && (
         <>
