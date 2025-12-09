@@ -525,6 +525,14 @@ export default function InteractiveResume() {
                 <span className="min-w-0 break-words break-all leading-snug text-center">JustinLe.Work@gmail.com</span>
               </a>
               <a
+                href="tel:+17049969469"
+                className="w-full flex items-center justify-center gap-2 rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-[11px] font-medium text-neutral-700 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-neutral-800/60 text-center whitespace-nowrap min-w-0 overflow-hidden"
+                aria-label="Call 704-996-9469"
+              >
+                <Phone className="w-4 h-4 mt-0.5 shrink-0" />
+                <span className="leading-snug text-center">704-996-9469</span>
+              </a>
+              <a
                 href="https://BuildAndServe.com"
                 target="_blank"
                 rel="noopener noreferrer"
