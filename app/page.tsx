@@ -241,6 +241,8 @@ export default function InteractiveResume() {
     { id: "technical", label: "Technical", note: "A", icon: Code },
     { id: "management", label: "Management", note: "A#", icon: Briefcase },
     { id: "strategy", label: "Strategy", note: "B", icon: Building },
+    // Final C for musical resolution
+    { id: "resolution", label: "Resolution", note: "C", icon: Award },
   ]
 
   const pianoKeys = [
@@ -256,6 +258,8 @@ export default function InteractiveResume() {
     { note: "A", isBlack: false, section: "Technical" },
     { note: "A#", isBlack: true, section: "Management" },
     { note: "B", isBlack: false, section: "Strategy" },
+    // Final C resolution key
+    { note: "C", isBlack: false, section: "Resolution" },
   ]
 
   // Map keyboard keys to piano notes. Holding Shift selects the sharp where applicable.
@@ -408,6 +412,11 @@ export default function InteractiveResume() {
           title: "Strategic Initiatives",
           content:
             "Technology roadmap planning and implementation • Legacy system modernization strategies • AI integration and automation opportunities • Performance optimization and scalability planning • Cost reduction through efficient architecture design • Innovation initiatives and emerging technology adoption • Business process improvement through technology solutions",
+        }
+      case "resolution":
+        return {
+          title: "Final C",
+          content: "I added this so that there is musical resolution.  haha",
         }
       default:
         return null
