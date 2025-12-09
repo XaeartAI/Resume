@@ -71,15 +71,11 @@ export default function InteractiveResume() {
   const [pressedKeys, setPressedKeys] = useState<string[]>([])
   const audioContextRef = useRef<AudioContext | null>(null)
   const { theme, setTheme, resolvedTheme } = useTheme()
-  const [isPortrait, setIsPortrait] = useState(false)
-  const [isSmallViewport, setIsSmallViewport] = useState(false)
   const [mounted, setMounted] = useState(false)
   const keyboardWrapperRef = useRef<HTMLDivElement | null>(null)
   const keyboardInnerRef = useRef<HTMLDivElement | null>(null)
   const [keyboardScale, setKeyboardScale] = useState(1)
   const [isMobileKeyboardOpen, setIsMobileKeyboardOpen] = useState(false)
-  const [showOrientationHint, setShowOrientationHint] = useState(false)
-  const [hasDismissedOrientationHint, setHasDismissedOrientationHint] = useState(false)
 
   useEffect(() => {
     setMounted(true)
@@ -169,43 +165,7 @@ export default function InteractiveResume() {
 
   // Keep mobile keyboard open even when a modal opens; modals will overlay it via z-index
 
-  // Track orientation and viewport size to gate portrait on small devices
-  useEffect(() => {
-    if (typeof window === "undefined") return
-    const orientationQuery = window.matchMedia("(orientation: portrait)")
-    const sizeQuery = window.matchMedia("(max-width: 1024px)")
-    const update = () => {
-      setIsPortrait(orientationQuery.matches)
-      setIsSmallViewport(sizeQuery.matches)
-    }
-    update()
-    const handleChange = () => update()
-    orientationQuery.addEventListener?.("change", handleChange)
-    sizeQuery.addEventListener?.("change", handleChange)
-    window.addEventListener("resize", handleChange)
-    window.addEventListener("orientationchange", handleChange)
-    return () => {
-      orientationQuery.removeEventListener?.("change", handleChange)
-      sizeQuery.removeEventListener?.("change", handleChange)
-      window.removeEventListener("resize", handleChange)
-      window.removeEventListener("orientationchange", handleChange)
-    }
-  }, [])
-
-  // Default to landscape guidance on mobile portrait
-  useEffect(() => {
-    if (typeof window === "undefined") return
-    const dismissed = window.sessionStorage.getItem("orientationHintDismissed") === "true"
-    setHasDismissedOrientationHint(dismissed)
-  }, [])
-
-  useEffect(() => {
-    if (isSmallViewport && isPortrait && !hasDismissedOrientationHint) {
-      setShowOrientationHint(true)
-    } else {
-      setShowOrientationHint(false)
-    }
-  }, [isSmallViewport, isPortrait, hasDismissedOrientationHint])
+  // (Removed mobile orientation hint logic)
 
   const sections = [
     { id: "summary", label: "Summary", note: "C", icon: User },
@@ -417,38 +377,7 @@ export default function InteractiveResume() {
 
   return (
     <div className={"fixed inset-0 bg-gradient-to-br from-neutral-50 to-neutral-100 dark:from-neutral-950 dark:to-black flex flex-col items-center overflow-x-hidden overflow-y-auto"}>
-      {/* Orientation hint overlay for small screens in portrait */}
-      {showOrientationHint && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/95 dark:bg-neutral-950/95 backdrop-blur-sm">
-          <div className="text-center px-6 w-full max-w-sm">
-            <div className="mx-auto mb-4 h-12 w-12 rounded-full border border-neutral-300 dark:border-neutral-700 flex items-center justify-center">
-              <svg viewBox="0 0 24 24" className="h-6 w-6 text-neutral-800 dark:text-neutral-200" fill="none" stroke="currentColor" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4 7a2 2 0 012-2h6l4 4v8a2 2 0 01-2 2H6a2 2 0 01-2-2V7z" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M14 5v4h4" />
-              </svg>
-            </div>
-            <h2 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-1">Rotate your device</h2>
-            <p className="text-neutral-700 dark:text-neutral-300 text-sm mb-4">
-              For the best experience, please rotate to landscape. You can continue in portrait if you prefer.
-            </p>
-            <div className="flex gap-2 justify-center">
-              <button
-                type="button"
-                className="px-3 py-2 rounded-md border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800/60 text-sm"
-                onClick={() => {
-                  setHasDismissedOrientationHint(true)
-                  if (typeof window !== "undefined") {
-                    window.sessionStorage.setItem("orientationHintDismissed", "true")
-                  }
-                  setShowOrientationHint(false)
-                }}
-              >
-                Continue in portrait
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* (Orientation hint overlay removed for mobile) */}
       <div className={"sticky top-0 left-0 right-0 p-4 md:p-6 backdrop-blur-sm z-30 border-b bg-white/90 dark:bg-neutral-900/80 border-neutral-200 dark:border-neutral-800"}>
         <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center max-w-7xl mx-auto w-full max-w-full overflow-x-hidden">
           <div>
