@@ -474,9 +474,12 @@ export default function InteractiveResume() {
               size="lg"
               variant="outline"
               className="hidden lg:inline-flex border-neutral-300 text-neutral-700 hover:bg-neutral-50 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-800 font-medium bg-transparent text-sm md:text-base px-3 py-2"
+              asChild
             >
-              <Mail className="w-4 h-4 mr-2" />
-              JustinLe.Work@gmail.com
+              <a href="mailto:JustinLe.Work@gmail.com" aria-label="Send email to JustinLe.Work@gmail.com">
+                <Mail className="w-4 h-4 mr-2" />
+                JustinLe.Work@gmail.com
+              </a>
             </Button>
             <Button
               size="lg"
