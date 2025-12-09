@@ -88,9 +88,8 @@ export default function InteractiveResume() {
   useEffect(() => {
     if (typeof window === "undefined") return
     try {
-      const isPortraitNow = window.matchMedia("(orientation: portrait)").matches
       const isSmallNow = window.matchMedia("(max-width: 1023px)").matches
-      if (isPortraitNow && isSmallNow) {
+      if (isSmallNow) {
         setIsMobileKeyboardOpen(true)
       }
     } catch {
@@ -537,7 +536,7 @@ export default function InteractiveResume() {
             aria-hidden="true"
           />
           <div className="lg:hidden fixed inset-x-0 bottom-0 z-30">
-            <div className="mx-auto w-full max-w-7xl">
+            <div className="w-full">
               <div className="rounded-t-2xl border border-neutral-300 dark:border-neutral-700 bg-gradient-to-b from-neutral-100 to-neutral-200 dark:from-neutral-800 dark:to-neutral-900 shadow-2xl max-h-[70vh] overflow-hidden">
                 <div className="flex items-center justify-between px-4 pt-3 pb-2">
                   <div className="mx-auto h-1.5 w-12 rounded-full bg-neutral-300 dark:bg-neutral-700" />
