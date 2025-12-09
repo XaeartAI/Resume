@@ -49,7 +49,10 @@ const PianoKey = ({
       {section && (
         <div className="text-center mb-4">
           <div
-            className={`font-semibold ${labelSizeClass} normal-case tracking-normal px-1 md:px-2 py-1 w-full max-w-full box-border truncate whitespace-nowrap text-center leading-snug shadow-sm ${isBlack ? "text-white bg-white/20 border border-white/25 rounded-md" : "text-neutral-800 dark:text-neutral-900 bg-black/5 dark:bg-white/60 border border-black/10 dark:border-white/40 rounded-md"} ${isPressed ? "opacity-100" : "opacity-90"} transition-all duration-150`}
+            className={`font-semibold ${labelSizeClass} normal-case tracking-normal px-1 md:px-2 py-1 w-full max-w-full box-border text-center leading-snug shadow-sm
+            ${isBlack ? "text-white bg-white/20 border border-white/25 rounded-md" : "text-neutral-800 dark:text-neutral-900 bg-black/5 dark:bg-white/60 border border-black/10 dark:border-white/40 rounded-md"}
+            ${isPressed ? "opacity-100" : "opacity-90"} transition-all duration-150
+            inline-block overflow-visible whitespace-nowrap rotate-45 origin-bottom-left sm:rotate-0 sm:origin-center sm:overflow-hidden sm:truncate`}
             title={section}
           >
             {displaySection}
@@ -79,6 +82,20 @@ export default function InteractiveResume() {
 
   useEffect(() => {
     setMounted(true)
+  }, [])
+
+  // Open mobile keyboard by default in portrait on small screens
+  useEffect(() => {
+    if (typeof window === "undefined") return
+    try {
+      const isPortraitNow = window.matchMedia("(orientation: portrait)").matches
+      const isSmallNow = window.matchMedia("(max-width: 1023px)").matches
+      if (isPortraitNow && isSmallNow) {
+        setIsMobileKeyboardOpen(true)
+      }
+    } catch {
+      // no-op
+    }
   }, [])
 
   useEffect(() => {
