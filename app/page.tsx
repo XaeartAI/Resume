@@ -647,9 +647,9 @@ export default function InteractiveResume() {
               if (e.button === 0) setActiveSection(null)
             }}
           />
-          <div className="absolute bottom-2 md:bottom-8 left-1/2 transform -translate-x-1/2 z-40 animate-in slide-in-from-bottom-2 duration-300 fade-in w-[92vw] md:w-auto">
+          <div className="fixed bottom-2 md:bottom-8 left-1/2 transform -translate-x-1/2 z-40 animate-in slide-in-from-bottom-2 duration-300 fade-in w-[92vw] md:w-auto">
             <div
-              className="bg-white dark:bg-neutral-900 border border-gray-300 dark:border-neutral-700 rounded-lg p-4 md:p-8 max-w-[92vw] md:max-w-4xl mx-auto shadow-xl"
+              className="bg-white dark:bg-neutral-900 border border-gray-300 dark:border-neutral-700 rounded-lg p-4 md:p-8 max-w-[92vw] md:max-w-4xl mx-auto shadow-xl max-h-[80vh] overflow-y-auto"
               onMouseDown={(e) => {
                 if (e.button === 0) setActiveSection(null)
               }}
