@@ -442,10 +442,10 @@ export default function InteractiveResume() {
             <div className="lg:hidden w-full grid grid-cols-1 gap-2">
               <a
                 href="mailto:JustinLe.Work@gmail.com"
-                className="w-full flex items-start justify-start gap-2 rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-[11px] font-medium text-neutral-700 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-neutral-800/60 text-left whitespace-normal break-words break-all min-w-0 overflow-hidden"
+                className="w-full flex items-center justify-center gap-2 rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-[11px] font-medium text-neutral-700 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-neutral-800/60 text-center whitespace-normal break-words break-all min-w-0 overflow-hidden"
               >
                 <Mail className="w-4 h-4 mt-0.5 shrink-0" />
-                <span className="min-w-0 break-words break-all leading-snug">JustinLe.Work@gmail.com</span>
+                <span className="min-w-0 break-words break-all leading-snug text-center">JustinLe.Work@gmail.com</span>
               </a>
               <a
                 href="https://BuildAndServe.com"
