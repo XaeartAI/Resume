@@ -49,7 +49,7 @@ const PianoKey = ({
       {section && (
         <div className="text-center mb-4">
           <div
-            className={`font-semibold ${labelSizeClass} normal-case tracking-normal px-1 md:px-3 py-1 w-full max-w-full box-border overflow-hidden whitespace-normal break-words hyphens-auto text-center leading-snug shadow-sm ${isBlack ? "text-white bg-white/20 border border-white/25 rounded-md" : "text-neutral-800 dark:text-neutral-900 bg-black/5 dark:bg-white/60 border border-black/10 dark:border-white/40 rounded-md"} ${isPressed ? "opacity-100" : "opacity-90"} transition-all duration-150 text-[9px] sm:text-[10px] md:text-[12px]`}
+            className={`font-semibold ${labelSizeClass} normal-case tracking-normal px-1 md:px-3 py-1 w-full max-w-full box-border overflow-hidden whitespace-normal break-words ${isBlack ? "break-all" : ""} hyphens-auto text-center leading-snug shadow-sm ${isBlack ? "text-white bg-white/20 border border-white/25 rounded-md" : "text-neutral-800 dark:text-neutral-900 bg-black/5 dark:bg-white/60 border border-black/10 dark:border-white/40 rounded-md"} ${isPressed ? "opacity-100" : "opacity-90"} transition-all duration-150`}
             title={section}
           >
             {displaySection}
